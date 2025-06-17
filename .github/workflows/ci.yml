@@ -1,0 +1,25 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    paths:
+      - 'modules/**'
+      - 'envs/**'
+
+jobs:
+  fmt-validate-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform fmt
+        run: terraform fmt -check
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false
