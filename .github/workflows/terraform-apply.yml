@@ -1,0 +1,73 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
+
+env:
+  TF_VER: 1.5.7
+
+jobs:
+  terraform:
+    name: Apply Terraform (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [dev, prod]
+        include:
+          - env: dev
+            branch: 'refs/heads/develop'
+            backend: envs/dev/backend.tf
+            tfvars: envs/dev/terraform.tfvars
+          - env: prod
+            branch: 'refs/heads/master'
+            backend: envs/prod/backend.tf
+            tfvars: envs/prod/terraform.tfvars
+
+    # Solo ejecuta cada configuración en su rama
+    if: github.ref == matrix.branch
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate terraform.tfvars
+        run: |
+          cat > ${{ matrix.tfvars }} <<EOF
+          aws_region             = "${{ secrets.TF_aws_region }}"
+          project_name           = "${{ secrets.TF_project_name }}"
+          environment            = "${{ matrix.env }}"
+          cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
+          EOF
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VER }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
+      - name: Cleanup previous state
+        run: rm -rf .terraform
+
+      - name: Terraform Init
+        run: terraform init -backend-config=${{ matrix.backend }}
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=${{ matrix.tfvars }}
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: terraform apply -auto-approve -var-file=${{ matrix.tfvars }}
