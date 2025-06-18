@@ -32,7 +32,7 @@ jobs:
             tfvars: envs/prod/terraform.tfvars
 
     # Solo ejecuta cada configuración en su rama
-    if: github.ref == matrix.branch
+    if: ${{ github.ref == matrix.branch }}
 
     steps:
       - name: Checkout repo
