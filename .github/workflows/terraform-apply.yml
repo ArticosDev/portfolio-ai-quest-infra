@@ -16,36 +16,26 @@ env:
 
 jobs:
   terraform:
-    name: Apply Terraform (${{ matrix.env }})
+    name: Apply Terraform
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [dev, prod]
         include:
           - env: dev
-            branch: 'refs/heads/develop'
+            branch: refs/heads/develop
             backend: envs/dev/backend.tf
             tfvars: envs/dev/terraform.tfvars
           - env: prod
-            branch: 'refs/heads/master'
+            branch: refs/heads/master
             backend: envs/prod/backend.tf
             tfvars: envs/prod/terraform.tfvars
-
-    # Solo ejecuta cada configuración en su rama
-    if: ${{ github.ref == matrix.branch }}
-
+    
+    # Solo ejecuta si la rama coincide con el ambiente
+    if: github.ref == matrix.branch
+    
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Generate terraform.tfvars
-        run: |
-          cat > ${{ matrix.tfvars }} <<EOF
-          aws_region             = "${{ secrets.TF_aws_region }}"
-          project_name           = "${{ secrets.TF_project_name }}"
-          environment            = "${{ matrix.env }}"
-          cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
-          EOF
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -53,11 +43,20 @@ jobs:
           terraform_version: ${{ env.TF_VER }}
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ secrets.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Generate terraform.tfvars
+        run: |
+          cat > ${{ matrix.tfvars }} <<EOF
+          aws_region = "${{ secrets.TF_aws_region }}"
+          project_name = "${{ secrets.TF_project_name }}"
+          environment = "${{ matrix.env }}"
+          cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
+          EOF
 
       - name: Cleanup previous state
         run: rm -rf .terraform
