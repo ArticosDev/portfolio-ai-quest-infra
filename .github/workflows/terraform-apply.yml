@@ -30,19 +30,19 @@ jobs:
             backend: envs/prod/backend.tf
             tfvars: envs/prod/terraform.tfvars
     
-    # Solo ejecuta si la rama coincide con el ambiente
-    if: github.ref == matrix.branch
-    
     steps:
       - name: Checkout repo
+        if: github.ref == matrix.branch
         uses: actions/checkout@v4
 
       - name: Setup Terraform
+        if: github.ref == matrix.branch
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VER }}
 
       - name: Configure AWS Credentials
+        if: github.ref == matrix.branch
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -50,6 +50,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Generate terraform.tfvars
+        if: github.ref == matrix.branch
         run: |
           cat > ${{ matrix.tfvars }} <<EOF
           aws_region = "${{ secrets.TF_aws_region }}"
@@ -59,14 +60,17 @@ jobs:
           EOF
 
       - name: Cleanup previous state
+        if: github.ref == matrix.branch
         run: rm -rf .terraform
 
       - name: Terraform Init
+        if: github.ref == matrix.branch
         run: terraform init -backend-config=${{ matrix.backend }}
 
       - name: Terraform Plan
+        if: github.ref == matrix.branch
         run: terraform plan -var-file=${{ matrix.tfvars }}
 
       - name: Terraform Apply
-        if: github.event_name == 'push'
+        if: github.ref == matrix.branch && github.event_name == 'push'
         run: terraform apply -auto-approve -var-file=${{ matrix.tfvars }}
