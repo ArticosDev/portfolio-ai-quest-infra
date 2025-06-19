@@ -29,12 +29,10 @@ jobs:
         include:
           - env: dev
             branch: refs/heads/develop
-            backend: envs/dev/backend.tf
-            tfvars: envs/dev/terraform.tfvars
+            path: envs/dev
           - env: prod
             branch: refs/heads/master
-            backend: envs/prod/backend.tf
-            tfvars: envs/prod/terraform.tfvars
+            path: envs/dev
 
     steps:
       - name: Checkout repo
@@ -58,7 +56,7 @@ jobs:
       - name: Generate terraform.tfvars
         if: github.ref == matrix.branch
         run: |
-          cat > ${{ matrix.tfvars }} <<EOF
+          cat > ${{ matrix.path }}/terraform.tfvars <<EOF
           aws_region = "${{ secrets.TF_aws_region }}"
           project_name = "${{ secrets.TF_project_name }}"
           environment = "${{ matrix.env }}"
@@ -71,12 +69,15 @@ jobs:
 
       - name: Terraform Init
         if: github.ref == matrix.branch
-        run: terraform init -backend-config=${{ matrix.backend }}
+        working-directory: ${{ matrix.path }}
+        run: terraform init -backend-config=backend.tf
 
       - name: Terraform Plan
         if: github.ref == matrix.branch
+        working-directory: ${{ matrix.path }}
         run: terraform plan -var-file=${{ matrix.tfvars }}
 
       - name: Terraform Apply
         if: github.ref == matrix.branch && github.event_name == 'push'
+        working-directory: ${{ matrix.path }}
         run: terraform apply -auto-approve -var-file=${{ matrix.tfvars }}
