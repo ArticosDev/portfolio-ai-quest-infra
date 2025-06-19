@@ -70,7 +70,7 @@ jobs:
       - name: Terraform Init
         if: github.ref == matrix.branch
         working-directory: ${{ matrix.path }}
-        run: terraform init -backend-config=backend.tf
+        run: terraform init
 
       - name: Terraform Plan
         if: github.ref == matrix.branch
