@@ -75,9 +75,9 @@ jobs:
       - name: Terraform Plan
         if: github.ref == matrix.branch
         working-directory: ${{ matrix.path }}
-        run: terraform plan -var-file=${{ matrix.tfvars }}
+        run: terraform plan
 
       - name: Terraform Apply
         if: github.ref == matrix.branch && github.event_name == 'push'
         working-directory: ${{ matrix.path }}
-        run: terraform apply -auto-approve -var-file=${{ matrix.tfvars }}
+        run: terraform apply -auto-approve
