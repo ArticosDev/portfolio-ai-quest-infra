@@ -18,6 +18,12 @@ jobs:
   terraform:
     name: Apply Terraform
     runs-on: ubuntu-latest
+
+    # Permisos para solicitar tokens OIDC
+    permissions:
+      id-token: write
+      contents: read
+
     strategy:
       matrix:
         include:
@@ -29,7 +35,7 @@ jobs:
             branch: refs/heads/master
             backend: envs/prod/backend.tf
             tfvars: envs/prod/terraform.tfvars
-    
+
     steps:
       - name: Checkout repo
         if: github.ref == matrix.branch
@@ -41,13 +47,13 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VER }}
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials via OIDC
         if: github.ref == matrix.branch
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: github-actions
 
       - name: Generate terraform.tfvars
         if: github.ref == matrix.branch

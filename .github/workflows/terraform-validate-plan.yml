@@ -11,6 +11,11 @@ jobs:
   fmt-validate-plan:
     runs-on: ubuntu-latest
 
+    # Permisos para solicitar tokens OIDC
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v3
 
@@ -20,12 +25,12 @@ jobs:
           terraform_version: 1.5.7
 
       # 1) Autenticación (sólo si planeas un plan "real")
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: github-actions
 
       # 2) Generar vars (o usar backend=false si no lo necesitas)
       - name: Generate terraform.tfvars
