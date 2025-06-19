@@ -19,7 +19,6 @@ jobs:
     name: Destroy (${{ github.event.inputs.environment }})
     runs-on: ubuntu-latest
 
-    # Permisos para solicitar tokens OIDC
     permissions:
       id-token: write
       contents: read

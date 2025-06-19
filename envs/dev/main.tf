@@ -1,8 +1,8 @@
 # Datos locales
 locals {
   common_tags = {
-      Project     = var.project_name
-      Environment = var.environment
+      project_name     = var.project_name
+      environment = var.environment
       ManagedBy   = "Terraform"
   }
 }
@@ -10,7 +10,7 @@ locals {
 # Módulo S3
 module "s3" {
   source = "../../modules/s3"
-  bucket_name = "${local.project_name}-${local.environment}"
+  bucket_name = "${var.project_name}-${var.environment}"
   tags        = local.common_tags
 }
 

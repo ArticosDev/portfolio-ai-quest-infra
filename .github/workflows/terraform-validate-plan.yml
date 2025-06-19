@@ -11,7 +11,6 @@ jobs:
   fmt-validate-plan:
     runs-on: ubuntu-latest
 
-    # Permisos para solicitar tokens OIDC
     permissions:
       id-token: write
       contents: read
