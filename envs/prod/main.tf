@@ -9,14 +9,14 @@ locals {
 
 # Módulo S3
 module "s3" {
-  source = "./modules/s3"
+  source = "../../modules/s3"
   bucket_name = "${local.project_name}-${local.environment}"
   tags        = local.common_tags
 }
 
 # Módulo CloudFront
 module "cloudfront" {
-  source = "./modules/cloudfront"
+  source = "../../modules/cloudfront"
   
   bucket_name             = module.s3.bucket_name
   bucket_domain_name      = module.s3.bucket_domain_name
