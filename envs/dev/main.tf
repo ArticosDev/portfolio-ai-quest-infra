@@ -7,14 +7,14 @@ locals {
   }
 }
 
-# Módulo S3
+# Module S3
 module "s3" {
   source = "../../modules/s3"
   bucket_name = "${var.project_name}-${var.environment}"
   tags        = local.common_tags
 }
 
-# Módulo CloudFront
+# Module CloudFront
 module "cloudfront" {
   source = "../../modules/cloudfront"
   
@@ -23,4 +23,15 @@ module "cloudfront" {
   bucket_regional_domain  = module.s3.bucket_regional_domain_name
   price_class           = var.cloudfront_price_class
   tags                  = local.common_tags
+}
+
+# Module CloudFront
+module "dynamodb" {
+  source = "../../modules/dynamodb"
+
+  table_name = var.table_name
+  hash_key = var.hash_key
+  attributes = var.attributes
+  ttl_attribute_name = var.ttl_attribute_name
+  ttl_enabled = var.ttl_enabled
 }
