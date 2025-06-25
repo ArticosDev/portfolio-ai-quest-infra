@@ -65,7 +65,8 @@ jobs:
           hash_key = "${{ vars.HASH_KEY }}"
           attributes = ${{ vars.ATTRIBUTES }}
           ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
-          ttl_enabled = "${{ vars.TTL_ENABLED }}"
+          ttl_enabled = ${{ vars.TTL_ENABLED }}
+
           EOF
 
       - name: Cleanup previous state
