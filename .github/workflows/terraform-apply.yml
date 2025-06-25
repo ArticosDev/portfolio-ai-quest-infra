@@ -56,12 +56,22 @@ jobs:
       - name: Generate terraform.tfvars
         if: github.ref == matrix.branch
         run: |
-          cat > ${{ matrix.path }}/terraform.tfvars <<EOF
-          aws_region = "${{ secrets.TF_aws_region }}"
-          project_name = "${{ secrets.TF_project_name }}"
-          environment = "${{ matrix.env }}"
+          cat <<EOF >  ${{ matrix.path }}/terraform.tfvars
+          aws_region             = "${{ secrets.TF_aws_region }}"
+          project_name           = "${{ secrets.TF_project_name }}"
+          environment            = "dev"
           cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
+          table_name             = "${{ vars.TABLE_NAME }}"
+          hash_key               = "${{ vars.HASH_KEY }}"
+          attributes             = ${{ vars.ATTRIBUTES }}
+          ttl_attribute_name     = "${{ vars.TTL_ATTRIBUTE_NAME }}"
+          ttl_enabled            = ${{ vars.TTL_ENABLED }}
           EOF
+
+      - name: Format generated terraform.tfvars
+        if: github.ref == matrix.branch
+        working-directory:  ${{ matrix.path }}
+        run: terraform fmt terraform.tfvars
 
       - name: Cleanup previous state
         if: github.ref == matrix.branch
