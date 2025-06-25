@@ -46,7 +46,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: envs/dev
-        run: terraform init -backend-config=envs/dev/backend.tf -input=false
+        run: terraform init -input=false
 
       - name: Terraform fmt
         working-directory: envs/dev
@@ -58,4 +58,4 @@ jobs:
 
       - name: Terraform Plan
         working-directory: envs/dev
-        run: terraform plan -input=false -lock=false -var-file=envs/dev/terraform.tfvars
+        run: terraform plan -input=false -lock=false
