@@ -11,7 +11,7 @@ resource "aws_cloudfront_distribution" "react_app" {
   origin {
     domain_name              = var.bucket_regional_domain
     origin_access_control_id = aws_cloudfront_origin_access_control.react_app.id
-    origin_id               = "S3-${var.bucket_name}"
+    origin_id                = "S3-${var.bucket_name}"
   }
 
   enabled             = true
@@ -61,7 +61,7 @@ resource "aws_cloudfront_distribution" "react_app" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
-    minimum_protocol_version = "TLSv1.2_2021"
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 
   tags = var.tags
