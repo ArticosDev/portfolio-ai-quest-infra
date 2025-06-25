@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate terraform.tfvars
         run: |
-          cat <<EOF > envs/dev/terraform.tfvars
+          cat <<EOF > envs/${{ github.event.inputs.environment }}/terraform.tfvars
           aws_region             = "${{ secrets.TF_aws_region }}"
           project_name           = "${{ secrets.TF_project_name }}"
           environment            = "dev"
@@ -44,7 +44,7 @@ jobs:
       - name: Format generated terraform.tfvars
         working-directory: envs/dev
         run: terraform fmt terraform.tfvars
-        
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
