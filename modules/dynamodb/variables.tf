@@ -25,3 +25,9 @@ variable "ttl_attribute_name" {
   description = "Name of the TTL attribute for the DynamoDB table"
   type        = string
 }
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
+}

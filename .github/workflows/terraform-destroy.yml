@@ -34,6 +34,11 @@ jobs:
           project_name           = "${{ secrets.TF_PROJECT_NAME }}"
           environment            = "${{ github.event.inputs.environment }}"
           cloudfront_price_class = "${{ secrets.TF_CLOUDFRONT_PRICE_CLASS }}"
+          table_name = "${{ vars.TABLE_NAME }}"
+          hash_key = "${{ vars.HASH_KEY }}"
+          attributes = "${{ vars.ATTRIBUTES }}"
+          ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
+          ttl_enabled = "${{ vars.TTL_ENABLED }}"
           EOF
 
       - name: Setup Terraform

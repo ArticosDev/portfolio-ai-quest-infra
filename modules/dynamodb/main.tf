@@ -17,4 +17,6 @@ resource "aws_dynamodb_table" "this" {
     enabled        = var.ttl_enabled
   }
   
+  tags = var.tags
+
 }
