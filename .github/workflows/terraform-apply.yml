@@ -68,6 +68,10 @@ jobs:
           ttl_enabled            = ${{ vars.TTL_ENABLED }}
           EOF
 
+      - name: Format generated terraform.tfvars
+        working-directory: envs/dev
+        run: terraform fmt terraform.tfvars
+        
       - name: Cleanup previous state
         if: github.ref == matrix.branch
         run: rm -rf .terraform

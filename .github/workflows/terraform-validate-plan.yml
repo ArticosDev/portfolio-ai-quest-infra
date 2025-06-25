@@ -42,6 +42,10 @@ jobs:
           ttl_enabled            = ${{ vars.TTL_ENABLED }}
           EOF
           
+      - name: Format generated terraform.tfvars
+        working-directory: envs/dev
+        run: terraform fmt terraform.tfvars
+        
       - name: Terraform Init
         working-directory: envs/dev
         run: terraform init -input=false

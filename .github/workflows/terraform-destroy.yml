@@ -41,6 +41,10 @@ jobs:
           ttl_enabled            = ${{ vars.TTL_ENABLED }}
           EOF
 
+      - name: Format generated terraform.tfvars
+        working-directory: envs/dev
+        run: terraform fmt terraform.tfvars
+        
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
