@@ -10,52 +10,50 @@ on:
 jobs:
   fmt-validate-plan:
     runs-on: ubuntu-latest
-
     permissions:
       id-token: write
       contents: read
-
     steps:
       - uses: actions/checkout@v3
-
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
-
+          
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-session-name: github-actions
-
+          
       - name: Generate terraform.tfvars
         run: |
-          cat <<-EOF > envs/dev/terraform.tfvars
-aws_region = "${{ secrets.TF_aws_region }}"
-project_name = "${{ secrets.TF_project_name }}"
-environment = "dev"
-cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
-table_name = "${{ vars.TABLE_NAME }}"
-hash_key = "${{ vars.HASH_KEY }}"
-attributes = ${{ vars.ATTRIBUTES }}
-ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
-ttl_enabled = ${{ vars.TTL_ENABLED }}
-EOF
-
+          cat <<EOF > envs/dev/terraform.tfvars
+          aws_region = "${{ secrets.TF_aws_region }}"
+          project_name = "${{ secrets.TF_project_name }}"
+          environment = "dev"
+          cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
+          table_name = "${{ vars.TABLE_NAME }}"
+          hash_key = "${{ vars.HASH_KEY }}"
+          attributes = ${{ vars.ATTRIBUTES }}
+          ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
+          ttl_enabled = ${{ vars.TTL_ENABLED }}
+          EOF
+          
       - name: Terraform Init
         working-directory: envs/dev
         run: terraform init -input=false
-
+        
       - name: Terraform fmt
         working-directory: envs/dev
         run: terraform fmt -check
-
+        
       - name: Terraform validate
         working-directory: envs/dev
         run: terraform validate
-
+        
       - name: Terraform Plan
         working-directory: envs/dev
         run: terraform plan -input=false -lock=false
