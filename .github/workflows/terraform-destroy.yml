@@ -29,18 +29,17 @@ jobs:
 
       - name: Generate terraform.tfvars
         run: |
-          cat > envs/${{ github.event.inputs.environment }}/terraform.tfvars <<EOF
-          aws_region             = "${{ secrets.AWS_REGION }}"                  # ← nombre consistente
-          project_name           = "${{ secrets.TF_PROJECT_NAME }}"
-          environment            = "${{ github.event.inputs.environment }}"
-          cloudfront_price_class = "${{ secrets.TF_CLOUDFRONT_PRICE_CLASS }}"
-          table_name = "${{ vars.TABLE_NAME }}"
-          hash_key = "${{ vars.HASH_KEY }}"
-          attributes = ${{ vars.ATTRIBUTES }}
-          ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
-          ttl_enabled = ${{ vars.TTL_ENABLED }}
-
-          EOF
+          cat <<-EOF > envs/dev/terraform.tfvars
+aws_region = "${{ secrets.TF_aws_region }}"
+project_name = "${{ secrets.TF_project_name }}"
+environment = "dev"
+cloudfront_price_class = "${{ secrets.TF_cloudfront_price_class }}"
+table_name = "${{ vars.TABLE_NAME }}"
+hash_key = "${{ vars.HASH_KEY }}"
+attributes = ${{ vars.ATTRIBUTES }}
+ttl_attribute_name = "${{ vars.TTL_ATTRIBUTE_NAME }}"
+ttl_enabled = ${{ vars.TTL_ENABLED }}
+EOF
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
